@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nutrilens/components/button_fab.dart';
 import 'package:nutrilens/components/text_field_fab.dart';
+import 'registration.dart';
 
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
@@ -17,7 +18,7 @@ class LoginPage extends StatelessWidget {
         child: Center(
           child: Column(
             children: [
-              const SizedBox(height: 200),
+              const SizedBox(height: 100),
               // Title
               const Text(
                 'NutriLens',
@@ -43,6 +44,17 @@ class LoginPage extends StatelessWidget {
               // sign in button
               ButtonFab(buttonText: 'Sign-In', onTap: signIn),
 
+              // registration button
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => RegistrationPage()),
+                  );
+                },
+                child: Text("Register"),
+              ),
+              
               // Oauth buttons
 
       ],)
