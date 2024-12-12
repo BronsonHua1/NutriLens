@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});  // Using super parameter for key
+  const ProfilePage({super.key});  
 
   @override
-  ProfilePageState createState() => ProfilePageState();  // Using public state class
+  ProfilePageState createState() => ProfilePageState();  
 }
 
-class ProfilePageState extends State<ProfilePage> {  // Changed from private to public
+class ProfilePageState extends State<ProfilePage> {  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
