@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:provider/provider.dart';
+import 'services/notification_service.dart';
 
 import 'pages/health_metrics_page.dart';
 import 'pages/login.dart';
@@ -19,75 +20,30 @@ import 'pages/ingredients_profile_page.dart';
 import 'pages/calorie_goal_page.dart';
 import 'pages/history_log_page.dart';
 
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // Handles background notifications
-  print("Handling background message: ${message.messageId}");
-}
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
-  // Set up background notifications
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  NotificationService notificationService = NotificationService();
+  await notificationService.initialize();
 
-  runApp(NutriLensApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => notificationService,
+      child: NutriLensApp(notificationService: notificationService),
+    ),
+  );
 }
 
-class NutriLensApp extends StatefulWidget {
-  const NutriLensApp({super.key});
-
-  @override
-  _NutriLensAppState createState() => _NutriLensAppState();
-}
-
-class _NutriLensAppState extends State<NutriLensApp> {
-  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
-
-  @override
-  void initState() {
-    super.initState();
-    _requestNotificationPermission();
-    _initializeFirebaseMessaging();
-  }
-
-  /// Request notification permission from the user
-  void _requestNotificationPermission() async {
-    NotificationSettings settings = await _firebaseMessaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
-
-    if (settings.authorizationStatus == AuthorizationStatus.denied) {
-      print("User declined notifications");
-    } else {
-      print("User granted notification permission");
-    }
-  }
-
-  /// Initialize Firebase Messaging for foreground and background notifications
-  void _initializeFirebaseMessaging() {
-    // Get FCM Token
-    _firebaseMessaging.getToken().then((token) {
-      print("FCM Token: $token");
-    });
-
-    // Handle notifications when the app is in foreground
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print("Received notification: ${message.notification?.title}");
-    });
-
-    // Handle notification tap when app is in background but not terminated
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      print("User opened the app from a notification: ${message.notification?.title}");
-    });
-  }
+class NutriLensApp extends StatelessWidget {
+  final NotificationService notificationService;
+  const NutriLensApp({super.key, required this.notificationService});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'NutriLens',
+      navigatorKey: notificationService.navigatorKey, // Use the global navigator key
       initialRoute: '/',
       routes: {
         '/': (context) => LoginPage(),
