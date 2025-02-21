@@ -19,6 +19,7 @@ class SearchPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const SizedBox(height: 100),
             Container(
               decoration: BoxDecoration(
                 color: Colors.purple[50],
@@ -44,6 +45,28 @@ class SearchPage extends StatelessWidget {
                     },
                   ),
                 ],
+              ),
+            ),
+            // Space between search bar and button
+            const SizedBox(height: 20),
+
+            // New button to navigate to another page
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/glossary'); // Change to your route
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green, // Button color
+                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                child: const Text(
+                  "Full Glossary",
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
               ),
             ),
           ],

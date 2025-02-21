@@ -1,17 +1,17 @@
 buildscript {
     repositories {
-        google() // ✅ Ensure this is here
-        mavenCentral() // ✅ Ensure this is here
+        google()
+        mavenCentral()
     }
     dependencies {
-        classpath("com.google.gms:google-services:4.3.15") // ✅ Ensure this is here
+        classpath("com.google.gms:google-services:4.3.15")
     }
 }
 
 allprojects {
     repositories {
-        google() // ✅ Ensure this is here
-        mavenCentral() // ✅ Ensure this is here
+        google()
+        mavenCentral()
     }
 }
 
