@@ -46,7 +46,19 @@ class _NotificationsPageState extends State<NotificationsPage> {
     var notificationService = Provider.of<NotificationService>(context);
 
     return Scaffold(
-      appBar: AppBar(title: Text("Notifications")),
+      appBar: AppBar(
+        title: Text("Notifications"),
+        actions: [
+          if (notificationService.notifications
+              .isNotEmpty) // Show button only if there are notifications
+            IconButton(
+              icon: Icon(Icons.delete_forever, color: Colors.red),
+              onPressed: () {
+                notificationService.clearAllNotifications();
+              },
+            ),
+        ],
+      ),
       body: notificationService.notifications.isEmpty
           ? Center(child: Text("No new notifications"))
           : ListView.builder(
@@ -91,7 +103,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.green, // Change color as needed
+        selectedItemColor: Colors.green,
         unselectedItemColor: Colors.grey,
         onTap: _onItemTapped,
         type: BottomNavigationBarType.fixed,

@@ -1,6 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
 
 class NotificationService with ChangeNotifier {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
@@ -46,20 +46,39 @@ class NotificationService with ChangeNotifier {
 
     // Handle foreground notifications
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      _notifications.insert(0, message); // Add to list
-      notifyListeners(); // Notify UI to update
+      _notifications.insert(0, message);
+      notifyListeners(); // Update UI
+
+      // Show a small alert when a notification appears
+      _showNotificationAlert(message);
     });
 
-    // Handle notification tap when app is in background but not terminated
+    // Handle notification tap when app is in background
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       _notifications.insert(0, message);
       notifyListeners();
-
-      // Navigate to Notifications Page
       navigatorKey.currentState?.pushNamed('/notifications');
     });
 
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  }
+
+  /// Show a Snackbar alert when a notification arrives in the foreground
+  void _showNotificationAlert(RemoteMessage message) {
+    if (navigatorKey.currentContext != null) {
+      ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(
+        SnackBar(
+          content: Text(message.notification?.title ?? "New Notification"),
+          action: SnackBarAction(
+            label: 'View',
+            onPressed: () {
+              navigatorKey.currentState?.pushNamed('/notifications');
+            },
+          ),
+          duration: Duration(seconds: 5),
+        ),
+      );
+    }
   }
 
   /// Delete a notification by index
@@ -69,6 +88,14 @@ class NotificationService with ChangeNotifier {
       notifyListeners(); // Update UI after deletion
     }
   }
+
+  /// Clear all notifications
+  void clearAllNotifications() {
+    _notifications.clear();
+    notifyListeners(); // Update UI after clearing all notifications
+  }
+
+
 
   /// Background message handler (must be static)
   static Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
