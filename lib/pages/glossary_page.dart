@@ -1,123 +1,130 @@
 import 'package:flutter/material.dart';
-import 'dart:math';
+import 'package:firebase_database/firebase_database.dart';
 
+//defines StatefulWidget for Glossary page
 class GlossaryPage extends StatefulWidget {
-  const GlossaryPage({super.key});
+  const GlossaryPage({Key? key}) : super(key: key); //constructor with optional key
 
   @override
+  //creates mutable state for this StatefulWidget
   _GlossaryPageState createState() => _GlossaryPageState();
 }
 
+//state class for GlossaryPage (handles dynamic aspects of page)
 class _GlossaryPageState extends State<GlossaryPage> {
-  final List<Map<String, String>> _allIngredients = List.generate(
-    50, // Simulating 50 ingredients
-    (index) => {
-      "name": "Ingredient ${index + 1}",
-      "description": "This is the description of Ingredient ${index + 1}.",
-    },
-  );
-
+  //reference to 'Ingredients' node in database
+  final DatabaseReference _ingredientsRef = FirebaseDatabase.instance.ref('Ingredients');
+  
+  //list to hold ingredients
   List<Map<String, String>> _displayedIngredients = [];
-  int _loadedCount = 10; // Start with 10 ingredients
-  final Set<int> _expandedIndices = {}; // Tracks expanded items
-  final Map<int, Color> _ingredientColors = {}; // Stores assigned colors
-
-  final List<Color> _colors = [
-    Colors.green.withOpacity(0.3), // Green
-    Colors.red.withOpacity(0.3),   // Red
-    Colors.yellow.withOpacity(0.3),// Yellow
-    Colors.grey.withOpacity(0.3),  // Grey
-  ];
+  
+  //tracks index of currently expanded ingredient list
+  int? _expandedIndex;
+  
+  //number of ingredients to load per batch
+  final int _batchSize = 10;
+  
+  //boolean flag to check if there are more items to be loaded
+  bool _hasMore = true;
 
   @override
+  //initial state setup, loads first batch of ingredients
   void initState() {
     super.initState();
-    _assignColors();
-    _loadMoreIngredients(); // Load initial 10 items
+    _loadIngredients();
   }
 
-  /// Assigns a random color to each ingredient
-  void _assignColors() {
-    final random = Random();
-    for (int i = 0; i < _allIngredients.length; i++) {
-      _ingredientColors[i] = _colors[random.nextInt(_colors.length)];
-    }
-  }
+  //async load ingredients from Firebase, handling pagination
+  void _loadIngredients() async {
+    DatabaseEvent event = await _ingredientsRef
+        .orderByKey()
+        .limitToFirst(_displayedIngredients.length + _batchSize)
+        .once();
 
-  void _loadMoreIngredients() {
-    setState(() {
-      int nextCount = _loadedCount + 10;
-      _displayedIngredients = _allIngredients.sublist(0, nextCount.clamp(0, _allIngredients.length));
-      _loadedCount = nextCount;
-    });
-  }
+    List<Map<String, String>> loadedIngredients = [];
 
-  void _toggleExpand(int index) {
-    setState(() {
-      if (_expandedIndices.contains(index)) {
-        _expandedIndices.remove(index);
-      } else {
-        _expandedIndices.add(index);
+    final snapshotData = event.snapshot.value;
+
+    if (snapshotData != null) {
+      if (snapshotData is Map<dynamic, dynamic>) {
+        // ✅ Your ideal case — map with custom keys
+        snapshotData.forEach((key, value) {
+          loadedIngredients.add({
+            "name": value["Name"] ?? "Unnamed",
+            "description": value["Description"] ?? "No Description",
+            "healthImpact": value["Health Rating"].toString(),
+            "category": value["Category"] ?? "Unknown",
+          });
+        });
+      } else if (snapshotData is List) {
+        // 🔁 Backup: handles list-based structure
+        for (var value in snapshotData) {
+          if (value != null) {
+            loadedIngredients.add({
+              "name": value["Name"] ?? "Unnamed",
+              "description": value["Description"] ?? "No Description",
+              "healthImpact": value["Health Rating"].toString(),
+              "category": value["Category"] ?? "Unknown",
+            });
+          }
+        }
       }
-    });
+
+      if (loadedIngredients.length <= _displayedIngredients.length) {
+        _hasMore = false;
+      }
+    } else {
+      _hasMore = false;
   }
+
+  setState(() {
+    _displayedIngredients = loadedIngredients;
+  });
+}
 
   @override
+  //builds widget tree for the Glossary page
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Glossary"), backgroundColor: Colors.green),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              itemCount: _displayedIngredients.length + 1, // Extra 1 for Load More Button
-              itemBuilder: (context, index) {
-                if (index < _displayedIngredients.length) {
-                  final ingredient = _displayedIngredients[index];
-                  final isExpanded = _expandedIndices.contains(index);
-                  final backgroundColor = _ingredientColors[index] ?? Colors.transparent;
+      appBar: AppBar(
+        title: const Text('Glossary'), //title for the AppBar
+        backgroundColor: Colors.green, //appBar background color
+      ),
+      body: ListView.builder(
+        itemCount: _displayedIngredients.length + (_hasMore ? 1 : 0), //increase count if more items can be loaded
+        itemBuilder: (context, index) {
+          //load more button is shown if there are more items to load
+          if (index == _displayedIngredients.length && _hasMore) {
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: OutlinedButton(
+                onPressed: _loadIngredients,
+                child: const Text('Load More'),
+              ),
+            );
+          }
+          //constructs a ListTile for each ingredient
+          final ingredient = _displayedIngredients[index];
+          bool isExpanded = _expandedIndex == index; //checks if tile is expanded
 
-                  return Column(
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: backgroundColor, // Highlighting the ingredient
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                        child: ListTile(
-                          title: Text(
-                            ingredient["name"]!,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          subtitle: isExpanded ? Text(ingredient["description"]!) : null,
-                          trailing: Icon(
-                            isExpanded ? Icons.expand_less : Icons.expand_more,
-                            color: Colors.green,
-                          ),
-                          onTap: () => _toggleExpand(index),
-                        ),
-                      ),
-                      if (isExpanded) const Divider(thickness: 1),
-                    ],
-                  );
-                } else if (_loadedCount < _allIngredients.length) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    child: Center(
-                      child: ElevatedButton(
-                        onPressed: _loadMoreIngredients,
-                        style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                        child: const Text("Load More", style: TextStyle(color: Colors.white)),
-                      ),
-                    ),
-                  );
+          return ListTile(
+            title: Text(ingredient['name']!),
+            subtitle: isExpanded ? Text("${ingredient['description']} \nHealth Rating (10 being the best): ${ingredient['healthImpact']} \nCategory: ${ingredient['category']}") : null,
+            onTap: () {
+              setState(() {
+                //toggle expanded state
+                if (isExpanded) {
+                  _expandedIndex = null; //collapse the current item
+                } else {
+                  _expandedIndex = index; //expand the tapped item
                 }
-                return const SizedBox.shrink(); // Hide the button if all are loaded
-              },
+              });
+            },
+            trailing: Icon(
+              isExpanded ? Icons.expand_less : Icons.expand_more,
             ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
