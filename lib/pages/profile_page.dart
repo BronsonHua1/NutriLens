@@ -4,6 +4,7 @@ import 'package:nutrilens/pages/change_email.dart';
 import 'package:nutrilens/pages/change_password.dart';
 import 'package:nutrilens/pages/calorie_goal_page.dart';
 import 'package:nutrilens/pages/allergen_info.dart';
+import 'package:nutrilens/pages/tracker_page.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 void main() {
@@ -147,6 +148,16 @@ class _ProfilePageState extends State<ProfilePage> {
                                     context,
                                     MaterialPageRoute(builder: (context) =>
                                         AllergenInfo()),
+                                  );
+                                },
+                              ),
+                              ListTile(
+                                title: const Text('Calorie/Nutrition Tracker'),
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) =>
+                                        TrackerPage()),
                                   );
                                 },
                               ),

@@ -3,6 +3,18 @@ import '../components/text_field_fab.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 
+Future<String?> getCalorieGoal() async {
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    DatabaseReference ref = FirebaseDatabase.instance.ref("Users/${user.uid}");
+    var snapshot = await ref.child('Calorie Goal').get();
+    if (snapshot.exists) {
+      return snapshot.value.toString();
+    }
+  }
+  return "None";
+}
+
 class CalorieGoalPage extends StatelessWidget {
   final goalController = TextEditingController();
 
@@ -16,18 +28,6 @@ class CalorieGoalPage extends StatelessWidget {
         "Calorie Goal" : input,
       });
     }
-  }
-
-  Future<String?> getCalorieGoal() async {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      DatabaseReference ref = FirebaseDatabase.instance.ref("Users/${user.uid}");
-      var snapshot = await ref.child('Calorie Goal').get();
-      if (snapshot.exists) {
-        return snapshot.value.toString();
-      }
-    }
-    return "None";
   }
 
   Future<void> inputCalorieGoal(BuildContext context) async {
