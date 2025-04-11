@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import '../services/notification_service.dart';
-import 'home_page.dart';
-import 'settings_page.dart';
-import 'search_page.dart';
-import 'profile_page.dart';
 
 class NotificationsPage extends StatefulWidget {
   @override
@@ -13,102 +8,138 @@ class NotificationsPage extends StatefulWidget {
 }
 
 class _NotificationsPageState extends State<NotificationsPage> {
-  int _selectedIndex = 1; // Set to 1 because this is the notifications page
+  String _searchQuery = '';
+  String _sortOption = 'Newest First';
+  String _filterOption = 'All';
 
-  void _onItemTapped(int index) {
-    if (index == _selectedIndex) return; // Prevents unnecessary rebuilds
-
-    switch (index) {
-      case 0:
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => SettingsPage()));
-        break;
-      case 1:
-      // Stay on the Notifications Page
-        break;
-      case 2:
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => HomePage()));
-        break;
-      case 3:
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => SearchPage()));
-        break;
-      case 4:
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => ProfilePage()));
-        break;
-    }
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<NotificationService>(context, listen: false).fetchRecalls();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     var notificationService = Provider.of<NotificationService>(context);
+    var recalls = notificationService.recalls;
+
+    /// **1️⃣ Apply Search Functionality**
+    List<Map<String, dynamic>> filteredRecalls = recalls.where((recall) {
+      return recall['product'].toLowerCase().contains(_searchQuery.toLowerCase()) ||
+          recall['reason'].toLowerCase().contains(_searchQuery.toLowerCase());
+    }).toList();
+
+    /// **2️⃣ Apply Sorting**
+    if (_sortOption == 'Newest First') {
+      filteredRecalls.sort((a, b) => b['date'].compareTo(a['date']));
+    } else if (_sortOption == 'Oldest First') {
+      filteredRecalls.sort((a, b) => a['date'].compareTo(b['date']));
+    } else if (_sortOption == 'Alphabetical (A-Z)') {
+      filteredRecalls.sort((a, b) => a['product'].compareTo(b['product']));
+    }
+
+    /// **3️⃣ Apply Filtering**
+    if (_filterOption == 'Past 7 Days') {
+      filteredRecalls = filteredRecalls.where((recall) {
+        DateTime recallDate = DateTime.parse(recall['date']);
+        return recallDate.isAfter(DateTime.now().subtract(Duration(days: 7)));
+      }).toList();
+    } else if (_filterOption == 'Past 30 Days') {
+      filteredRecalls = filteredRecalls.where((recall) {
+        DateTime recallDate = DateTime.parse(recall['date']);
+        return recallDate.isAfter(DateTime.now().subtract(Duration(days: 30)));
+      }).toList();
+    }
 
     return Scaffold(
       appBar: AppBar(
         title: Text("Notifications"),
         actions: [
-          if (notificationService.notifications
-              .isNotEmpty) // Show button only if there are notifications
-            IconButton(
-              icon: Icon(Icons.delete_forever, color: Colors.red),
-              onPressed: () {
-                notificationService.clearAllNotifications();
+          IconButton(
+            icon: Icon(Icons.refresh),
+            onPressed: () {
+              Provider.of<NotificationService>(context, listen: false).fetchRecalls();
+            },
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          /// **🔍 Search Bar**
+          Padding(
+            padding: const EdgeInsets.all(10),
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: "Search Recalls...",
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value;
+                });
               },
             ),
-        ],
-      ),
-      body: notificationService.notifications.isEmpty
-          ? Center(child: Text("No new notifications"))
-          : ListView.builder(
-        itemCount: notificationService.notifications.length,
-        itemBuilder: (context, index) {
-          RemoteMessage message = notificationService.notifications[index];
-          return Card(
-            child: ListTile(
-              title: Text(message.notification?.title ?? "No Title"),
-              subtitle: Text(message.notification?.body ?? "No Content"),
-              trailing: IconButton(
-                icon: Icon(Icons.delete, color: Colors.red),
-                onPressed: () {
-                  notificationService.deleteNotification(index);
-                },
-              ),
+          ),
+
+          /// **🔽 Sorting & Filtering Dropdowns**
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                /// **Sorting Dropdown**
+                DropdownButton<String>(
+                  value: _sortOption,
+                  items: ['Newest First', 'Oldest First', 'Alphabetical (A-Z)']
+                      .map((sort) => DropdownMenuItem(value: sort, child: Text(sort)))
+                      .toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _sortOption = value!;
+                    });
+                  },
+                ),
+
+                /// **Filtering Dropdown**
+                DropdownButton<String>(
+                  value: _filterOption,
+                  items: ['All', 'Past 7 Days', 'Past 30 Days']
+                      .map((filter) => DropdownMenuItem(value: filter, child: Text(filter)))
+                      .toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _filterOption = value!;
+                    });
+                  },
+                ),
+              ],
             ),
-          );
-        },
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: '',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: '',
+
+          /// **📜 List of Recalls (Filtered & Sorted)**
+          Expanded(
+            child: filteredRecalls.isEmpty
+                ? Center(child: Text("No recalls found"))
+                : ListView.builder(
+              itemCount: filteredRecalls.length,
+              itemBuilder: (context, index) {
+                var recall = filteredRecalls[index];
+                return Card(
+                  child: ListTile(
+                    title: Text(
+                      "⚠️ ${recall['product']}",
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
+                    ),
+                    subtitle: Text("Reason: ${recall['reason']}\nDate: ${recall['date']}"),
+                  ),
+                );
+              },
+            ),
           ),
         ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.green,
-        unselectedItemColor: Colors.grey,
-        onTap: _onItemTapped,
-        type: BottomNavigationBarType.fixed,
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
       ),
     );
   }

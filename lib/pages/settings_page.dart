@@ -1,7 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../services/api_service.dart';
+import '../services/notification_service.dart';
 
-class SettingsPage extends StatelessWidget {
-  const SettingsPage({super.key});
+class SettingsPage extends StatefulWidget {
+  @override
+  _SettingsPageState createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  String _selectedFrequency = "daily"; // Default option
+  final String userId = "test_user"; // Replace with actual user ID (Firebase Auth)
+
+  @override
+  void initState() {
+    super.initState();
+    _loadNotificationPreference();
+  }
+
+  Future<void> _loadNotificationPreference() async {
+    var notificationService = Provider.of<NotificationService>(context, listen: false);
+    String frequency = await notificationService.getNotificationFrequency(userId);
+    setState(() {
+      _selectedFrequency = frequency;
+    });
+  }
+
+  void _updateNotificationPreference(String newFrequency) async {
+    var notificationService = Provider.of<NotificationService>(context, listen: false);
+    await notificationService.saveNotificationFrequency(userId, newFrequency);
+
+    setState(() {
+      _selectedFrequency = newFrequency;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Notification frequency updated to: $newFrequency")),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -11,12 +47,12 @@ class SettingsPage extends StatelessWidget {
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.white,
-        foregroundColor: Colors.black, // Text color
+        foregroundColor: Colors.black,
       ),
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
         children: [
-          // Notifications
+          /// **Notifications**
           ListTile(
             title: const Text(
               'Notifications',
@@ -29,7 +65,49 @@ class SettingsPage extends StatelessWidget {
           ),
           const Divider(),
 
-          // Language
+          /// Notification Frequency
+          ListTile(
+            title: const Text(
+              'Notification Frequency',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            subtitle: const Text("Choose how often you receive alerts"),
+            trailing: DropdownButton<String>(
+              value: _selectedFrequency,
+              items: ["daily", "weekly"]
+                  .map((freq) => DropdownMenuItem(value: freq, child: Text(freq.toUpperCase())))
+                  .toList(),
+              onChanged: (value) {
+                if (value != null) {
+                  _updateNotificationPreference(value);
+                }
+              },
+            ),
+          ),
+          const Divider(),
+
+          /// **FDA Recalls Check**
+          ListTile(
+            title: const Text(
+              'Check FDA Recalls',
+              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
+            ),
+            trailing: const Icon(Icons.warning, color: Colors.red),
+            onTap: () async {
+              ApiService apiService = ApiService();
+              await apiService.fetchFDARecalls();
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("🔍 Checking for FDA Recalls..."),
+                  duration: Duration(seconds: 3),
+                ),
+              );
+            },
+          ),
+          const Divider(),
+
+          /// **Language**
           ListTile(
             title: const Text(
               'Language',
@@ -42,7 +120,7 @@ class SettingsPage extends StatelessWidget {
           ),
           const Divider(),
 
-          // Theme
+          /// **Theme**
           ListTile(
             title: const Text(
               'Theme',
@@ -55,7 +133,7 @@ class SettingsPage extends StatelessWidget {
           ),
           const Divider(),
 
-          // Dietary Preferences
+          /// **Dietary Preferences**
           ListTile(
             title: const Text(
               'Dietary Preferences',
@@ -68,7 +146,7 @@ class SettingsPage extends StatelessWidget {
           ),
           const Divider(),
 
-          // User Guide
+          /// **User Guide**
           ListTile(
             title: const Text(
               'User Guide',
@@ -81,7 +159,7 @@ class SettingsPage extends StatelessWidget {
           ),
           const Divider(),
 
-          // Support
+          /// **Support**
           ListTile(
             title: const Text(
               'Support',
@@ -94,7 +172,7 @@ class SettingsPage extends StatelessWidget {
           ),
           const Divider(),
 
-          // Change Password
+          /// **Change Password**
           ListTile(
             title: const Text(
               'Change Password',
@@ -107,7 +185,7 @@ class SettingsPage extends StatelessWidget {
           ),
           const Divider(),
 
-          // Log out
+          /// **Log out**
           ListTile(
             title: const Text(
               'Log out',
@@ -123,7 +201,7 @@ class SettingsPage extends StatelessWidget {
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0, // Index for Settings Page
+        currentIndex: 0,
         type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(
@@ -149,13 +227,13 @@ class SettingsPage extends StatelessWidget {
         ],
         onTap: (index) {
           if (index == 0) {
-            Navigator.pushNamed(context, '/settings'); // Navigate to Settings
+            Navigator.pushNamed(context, '/settings');
           } else if (index == 1) {
             Navigator.pushNamed(context, '/notifications');
           } else if (index == 2) {
-            Navigator.pushNamed(context, '/home'); // Navigate to Home
+            Navigator.pushNamed(context, '/home');
           } else if (index == 3) {
-            Navigator.pushNamed(context, '/search'); // Stay on Search Page
+            Navigator.pushNamed(context, '/search');
           } else if (index == 4) {
             Navigator.pushNamed(context, '/profile');
           }

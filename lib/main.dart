@@ -19,10 +19,15 @@ import 'pages/ingredients_profile_page.dart';
 import 'pages/calorie_goal_page.dart';
 import 'pages/history_log_page.dart';
 import 'pages/glossary_page.dart';
+import 'pages/deleted_notifications_page.dart';
+import 'services/api_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+
+  // Fetch recalls when the app starts
+  ApiService().fetchFDARecalls();
 
   NotificationService notificationService = NotificationService();
   await notificationService.initialize();
@@ -63,6 +68,7 @@ class NutriLensApp extends StatelessWidget {
         '/health_metrics': (context) => HealthMetricsPage(),
         '/history_log': (context) => HistoryLogPage(),
         '/glossary': (context) => GlossaryPage(),
+        './deleted_notifications': (context) => DeletedNotificationsPage(),
       },
     );
   }
