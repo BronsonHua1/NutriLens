@@ -21,6 +21,8 @@ import 'pages/history_log_page.dart';
 import 'pages/glossary_page.dart';
 import 'pages/deleted_notifications_page.dart';
 import 'services/api_service.dart';
+import 'pages/deals_page.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -69,6 +71,7 @@ class NutriLensApp extends StatelessWidget {
         '/history_log': (context) => HistoryLogPage(),
         '/glossary': (context) => GlossaryPage(),
         './deleted_notifications': (context) => DeletedNotificationsPage(),
+        '/deals': (context) => DealsPage()
       },
     );
   }

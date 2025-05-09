@@ -14,37 +14,36 @@ class _SearchPageState extends State<SearchPage> {
   final TextEditingController _searchController = TextEditingController();
   int? _healthScore;
   List<String> _matchedIngredients = [];
+  List<String> _harmfulIngredients = [];
+  List<String> _searchHistory = []; // ✅ Track user searches
+
   List<String> _suggestions = [
-    "coca cola",
-    "fruit punch juice drink",
-    "orange juice",
-    "green tea",
-    "peanut butter",
-    "energy drink",
-    "soda",
-    "water",
-    "protein bar",
-    "chocolate milk",
-    "almond milk",
-    "yogurt",
-    "granola bar",
-    "cola zero",
-    "monster energy",
-    "apple juice",
-    "lemonade",
-    "snack chips",
-    "diet soda",
-    "sports drink",
-    "sparkling water",
-    "vegetable juice",
-    "milk chocolate",
-    "dark chocolate",
-    "trail mix",
-    "instant noodles"
+    "coca cola", "fruit punch juice drink", "orange juice", "green tea",
+    "peanut butter", "energy drink", "soda", "water", "protein bar", "chocolate milk",
+    "almond milk", "yogurt", "granola bar", "cola zero", "monster energy",
+    "apple juice", "lemonade", "snack chips", "diet soda", "sports drink",
+    "sparkling water", "vegetable juice", "milk chocolate", "dark chocolate", "trail mix",
+    "instant noodles", "smoothie drink", "coconut water", "kombucha", "soy milk",
+    "cashew milk", "oat milk", "turmeric latte", "boba tea", "black tea", "herbal tea",
+    "iced coffee", "protein shake", "mango juice", "pineapple juice", "carrot juice",
+    "ginger ale", "red bull", "gatorade", "vitamin water", "cold brew coffee",
+    "matcha latte", "chia pudding", "greek yogurt", "peach tea", "vegan protein bar",
+    "protein cookies", "vegan chocolate", "cashew butter", "hazelnut spread",
+    "cinnamon cereal", "organic apple juice", "plant-based protein bar",
+    "kale chips", "rice cakes", "coconut yogurt", "whey protein powder",
+    "pea protein drink", "ginger shots", "organic orange juice", "low sugar granola",
+    "avocado smoothie", "spinach juice", "mixed berries", "pomegranate juice",
+    "collagen water", "acai bowl", "oatmeal raisin cookie", "espresso shot",
+    "green smoothie", "flavored sparkling water", "cherry juice", "kombucha tea",
+    "high fiber cereal", "vegan cheese snack", "dark roast coffee", "low carb snack",
+    "banana chips", "plant protein drink", "honey lemon tea", "beet juice",
+    "recovery drink", "matcha powder", "ginger turmeric shot", "low fat milk",
+    "cucumber water", "cashew yogurt", "cranberry juice", "iced matcha",
+    "peanut butter smoothie",
   ];
+
   List<String> _filteredSuggestions = [];
 
-  // Analyzes the input to retrieve ingredients and calculate health score
   Future<void> _analyzeSearch() async {
     final input = _searchController.text.toLowerCase().trim();
     if (input.isEmpty) return;
@@ -61,6 +60,9 @@ class _SearchPageState extends State<SearchPage> {
     setState(() {
       _healthScore = result["score"];
       _matchedIngredients = ingredients;
+      _harmfulIngredients = result["harmful_ingredients"] ?? [];
+      _searchHistory.add(input); //  Save search history
+      _filteredSuggestions.clear(); // Clear suggestions after search
     });
 
     if (result["harmful_count"] > 0) {
@@ -74,7 +76,6 @@ class _SearchPageState extends State<SearchPage> {
     }
   }
 
-  // Builds the colored badge that shows the health score
   Widget buildHealthScoreBadge(int score) {
     Color badgeColor;
     if (score >= 8) {
@@ -98,7 +99,6 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  // Builds a list of ingredients
   Widget buildIngredientList(List<String> ingredients) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,20 +108,32 @@ class _SearchPageState extends State<SearchPage> {
           "Ingredients:",
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
         ),
-        ...ingredients.map((e) => Padding(
-          padding: const EdgeInsets.symmetric(vertical: 2.0),
-          child: Text("• $e"),
-        )),
+        ...ingredients.map((e) {
+          final isHarmful = _harmfulIngredients.contains(e.toLowerCase());
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 2.0),
+            child: Text(
+              "• $e",
+              style: TextStyle(
+                color: isHarmful ? Colors.red : Colors.black,
+                fontWeight: isHarmful ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
+          );
+        }),
       ],
     );
   }
 
-  // Filters suggestions based on user input
   void _updateSuggestions(String input) {
     setState(() {
-      _filteredSuggestions = _suggestions
-          .where((item) => item.toLowerCase().contains(input.toLowerCase()))
-          .toList();
+      if (input.isEmpty) {
+        _filteredSuggestions = _suggestions.take(8).toList(); // Show trending suggestions
+      } else {
+        _filteredSuggestions = _suggestions
+            .where((item) => item.toLowerCase().contains(input.toLowerCase()))
+            .toList();
+      }
     });
   }
 
@@ -135,13 +147,12 @@ class _SearchPageState extends State<SearchPage> {
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
       ),
-      body: SingleChildScrollView( // ✅ Fix overflow by wrapping with scroll view
+      body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 40),
-            // Search Bar + Suggestions
+            const SizedBox(height: 30),
             Container(
               decoration: BoxDecoration(
                 color: Colors.purple[50],
@@ -162,6 +173,7 @@ class _SearchPageState extends State<SearchPage> {
                             border: InputBorder.none,
                           ),
                           onChanged: _updateSuggestions,
+                          onSubmitted: (value) => _analyzeSearch(),
                         ),
                       ),
                       IconButton(
@@ -178,19 +190,41 @@ class _SearchPageState extends State<SearchPage> {
                         _filteredSuggestions.clear();
                         _analyzeSearch();
                       },
-                    ))
+                    )),
+                  if (_filteredSuggestions.isEmpty && _searchHistory.isNotEmpty)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 10),
+                        const Text("Recent Searches:", style: TextStyle(fontWeight: FontWeight.bold)),
+                        ..._searchHistory.reversed.take(5).map((e) => ListTile(
+                          title: Text(e),
+                          onTap: () {
+                            _searchController.text = e;
+                            _analyzeSearch();
+                          },
+                        )),
+                      ],
+                    )
                 ],
               ),
             ),
             const SizedBox(height: 20),
             if (_healthScore != null)
-              Center(
-                child: buildHealthScoreBadge(_healthScore!),
-              ),
+              Center(child: buildHealthScoreBadge(_healthScore!)),
             if (_matchedIngredients.isNotEmpty)
               buildIngredientList(_matchedIngredients),
+            if (_healthScore != null && _healthScore! <= 4)
+              Padding(
+                padding: const EdgeInsets.only(top: 20),
+                child: Center(
+                  child: Text(
+                    "⚠️ Consider healthier alternatives!",
+                    style: TextStyle(color: Colors.redAccent, fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
             const SizedBox(height: 20),
-            // Glossary Navigation Button
             Center(
               child: ElevatedButton(
                 onPressed: () {
@@ -217,39 +251,18 @@ class _SearchPageState extends State<SearchPage> {
         currentIndex: 3,
         type: BottomNavigationBarType.fixed,
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search, color: Colors.green),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: '',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.search, color: Colors.green), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
         ],
         onTap: (index) {
-          if (index == 0) {
-            Navigator.pushNamed(context, '/settings');
-          } else if (index == 1) {
-            Navigator.pushNamed(context, '/notifications');
-          } else if (index == 2) {
-            Navigator.pushNamed(context, '/home');
-          } else if (index == 3) {
-            Navigator.pushNamed(context, '/search');
-          } else if (index == 4) {
-            Navigator.pushNamed(context, '/profile');
-          }
+          if (index == 0) Navigator.pushNamed(context, '/settings');
+          if (index == 1) Navigator.pushNamed(context, '/notifications');
+          if (index == 2) Navigator.pushNamed(context, '/home');
+          if (index == 3) Navigator.pushNamed(context, '/search');
+          if (index == 4) Navigator.pushNamed(context, '/profile');
         },
       ),
     );

@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/api_service.dart';
 import '../services/notification_service.dart';
+import '../services/smart_final_deals_scraper.dart';
+import 'package:firebase_database/firebase_database.dart';
+import '../services/sprouts_deals_scraper.dart';
+import '../services/albertsons_deals_scraper.dart';
+
+
+
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -25,6 +32,27 @@ class _SettingsPageState extends State<SettingsPage> {
       _selectedFrequency = frequency;
     });
   }
+
+
+  Future<void> testFirebaseWrite() async {
+    final DatabaseReference testRef = FirebaseDatabase.instance.ref('test_connection');
+
+    try {
+      await testRef.set({
+        'message': 'Hello from NutriLens!',
+        'timestamp': DateTime.now().toIso8601String(),
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('✅ Successfully wrote to Firebase!')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('❌ Failed to write to Firebase: $e')),
+      );
+    }
+  }
+
 
   void _updateNotificationPreference(String newFrequency) async {
     var notificationService = Provider.of<NotificationService>(context, listen: false);
@@ -107,6 +135,22 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           const Divider(),
 
+          // Web Scraper
+          ListTile(
+            title: const Text('Fetch Albertsons Deals', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+            trailing: const Icon(Icons.local_offer, color: Colors.red),
+            onTap: () async {
+              final scraper = AlbertsonsDealsScraper();
+              await scraper.scrapeAndSaveDeals();
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('✅ Albertsons Deals fetched and saved!')),
+              );
+            },
+          ),
+          const Divider(),
+
+
           /// **Language**
           ListTile(
             title: const Text(
@@ -184,6 +228,18 @@ class _SettingsPageState extends State<SettingsPage> {
             },
           ),
           const Divider(),
+
+
+          ListTile(
+            title: const Text('Test Firebase Connection', style: TextStyle(fontWeight: FontWeight.bold)),
+            trailing: const Icon(Icons.cloud_upload),
+            onTap: () async {
+              await testFirebaseWrite();
+            },
+          ),
+          const Divider(),
+
+
 
           /// **Log out**
           ListTile(

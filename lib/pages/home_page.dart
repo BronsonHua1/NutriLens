@@ -36,44 +36,33 @@ class HomePage extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 2, // Index of the HomePage
+        currentIndex: 2, // Deals index will be 2 now
         type: BottomNavigationBarType.fixed,
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home, color: Colors.green), // Highlighted home icon
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: '',
-          ),
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.local_offer), label: ''), // ✅ Deals tab
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
         ],
         onTap: (index) {
           if (index == 0) {
-            Navigator.pushNamed(context, '/settings'); 
+            Navigator.pushNamed(context, '/settings');
           } else if (index == 1) {
             Navigator.pushNamed(context, '/notifications');
           } else if (index == 2) {
-            Navigator.pushNamed(context, '/home');
+            Navigator.pushNamed(context, '/deals'); // ✅ Deals page
           } else if (index == 3) {
-            Navigator.pushNamed(context, '/search');
+            Navigator.pushNamed(context, '/home');
           } else if (index == 4) {
+            Navigator.pushNamed(context, '/search');
+          } else if (index == 5) {
             Navigator.pushNamed(context, '/profile');
           }
         },
       ),
+
     );
   }
 }
