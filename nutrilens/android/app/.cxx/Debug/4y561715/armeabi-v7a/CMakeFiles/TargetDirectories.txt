@@ -1,0 +1,2 @@
+/home/isaac/Projects/491Proj/NutriLens/nutrilens/android/app/.cxx/Debug/4y561715/armeabi-v7a/CMakeFiles/edit_cache.dir
+/home/isaac/Projects/491Proj/NutriLens/nutrilens/android/app/.cxx/Debug/4y561715/armeabi-v7a/CMakeFiles/rebuild_cache.dir

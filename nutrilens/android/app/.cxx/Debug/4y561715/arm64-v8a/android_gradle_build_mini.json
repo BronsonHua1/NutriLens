@@ -1,0 +1,20 @@
+{
+  "buildFiles": [
+    "/home/isaac/flutter/packages/flutter_tools/gradle/src/main/groovy/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/home/isaac/Android/Sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/home/isaac/Projects/491Proj/NutriLens/nutrilens/android/app/.cxx/Debug/4y561715/arm64-v8a",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/home/isaac/Android/Sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/home/isaac/Projects/491Proj/NutriLens/nutrilens/android/app/.cxx/Debug/4y561715/arm64-v8a",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {}
+}

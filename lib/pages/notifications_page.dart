@@ -6,6 +6,7 @@ import 'home_page.dart';
 import 'settings_page.dart';
 import 'search_page.dart';
 import 'profile_page.dart';
+import '../theme/theme_colors.dart';
 
 class NotificationsPage extends StatefulWidget {
   @override
@@ -46,28 +47,60 @@ class _NotificationsPageState extends State<NotificationsPage> {
     var notificationService = Provider.of<NotificationService>(context);
 
     return Scaffold(
-      appBar: AppBar(title: Text("Notifications")),
-      body: notificationService.notifications.isEmpty
-          ? Center(child: Text("No new notifications"))
-          : ListView.builder(
-        itemCount: notificationService.notifications.length,
-        itemBuilder: (context, index) {
-          RemoteMessage message = notificationService.notifications[index];
-          return Card(
-            child: ListTile(
-              title: Text(message.notification?.title ?? "No Title"),
-              subtitle: Text(message.notification?.body ?? "No Content"),
-              trailing: IconButton(
-                icon: Icon(Icons.delete, color: Colors.red),
-                onPressed: () {
-                  notificationService.deleteNotification(index);
+      appBar: AppBar(
+        title: Text('Nutrilens'),
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: ThemeColor.background,
+        foregroundColor: ThemeColor.textPrimary, // Text color
+      ),
+      body: Container(
+        color: ThemeColor.background,
+        child: notificationService.notifications.isEmpty
+            ? Center(
+                child: Text(
+                  "No new notifications",
+                  style: TextStyle(
+                    color: ThemeColor.textPrimary, 
+                    fontSize: 18,
+                  ),
+                ),
+              )
+            : ListView.builder(
+                itemCount: notificationService.notifications.length,
+                itemBuilder: (context, index) {
+                  RemoteMessage message = notificationService.notifications[index];
+                  return Card(
+                    color: ThemeColor.background.withOpacity(0.9),
+                    child: ListTile(
+                      title: Text(
+                        message.notification?.title ?? "No Title",
+                        style: TextStyle(
+                          color: ThemeColor.textPrimary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      subtitle: Text(
+                        message.notification?.body ?? "No Content",
+                        style: TextStyle(
+                          color: ThemeColor.textSecondary,
+                          fontSize: 14,
+                        ),
+                      ),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: () {
+                          notificationService.deleteNotification(index);
+                        },
+                      ),
+                    ),
+                  );
                 },
               ),
-            ),
-          );
-        },
       ),
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: ThemeColor.background,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
@@ -91,8 +124,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.green, // Change color as needed
-        unselectedItemColor: Colors.grey,
+        selectedItemColor: ThemeColor.primary, // Change color as needed
+        unselectedItemColor: ThemeColor.textSecondary,
         onTap: _onItemTapped,
         type: BottomNavigationBarType.fixed,
         showSelectedLabels: false,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/theme_colors.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -10,53 +11,57 @@ class HomePage extends StatelessWidget {
         title: Text('Nutrilens'),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black, // Text color
+        backgroundColor: ThemeColor.background,
+        foregroundColor: ThemeColor.textPrimary, // Text color
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center, // Center vertically
-          crossAxisAlignment: CrossAxisAlignment.center, // Center horizontally
-          children: [
-            Icon(
-              Icons.camera_alt_outlined, // Camera icon
-              size: 150,
-              color: Colors.black,
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Scan now!',
-              style: TextStyle(
-                fontSize: 20,
-                color: Colors.green,
-                fontWeight: FontWeight.bold,
+      body: Container(
+        color: ThemeColor.background,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center, // Center vertically
+            crossAxisAlignment: CrossAxisAlignment.center, // Center horizontally
+            children: [
+              Icon(
+                Icons.camera_alt_outlined, // Camera icon
+                size: 150,
+                color: ThemeColor.textSecondary,
               ),
-            ),
-          ],
+              SizedBox(height: 20),
+              Text(
+                'Scan now!',
+                style: TextStyle(
+                  fontSize: 20,
+                  color: ThemeColor.primary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: ThemeColor.background,
         currentIndex: 2, // Index of the HomePage
         type: BottomNavigationBarType.fixed,
         items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
+            icon: Icon(Icons.settings, color: ThemeColor.textSecondary),
             label: '',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
+            icon: Icon(Icons.notifications, color: ThemeColor.textSecondary),
             label: '',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.home, color: Colors.green), // Highlighted home icon
+            icon: Icon(Icons.home, color: ThemeColor.primary),
             label: '',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.search),
+            icon: Icon(Icons.search, color: ThemeColor.textSecondary),
             label: '',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
+            icon: Icon(Icons.person, color: ThemeColor.textSecondary),
             label: '',
           ),
         ],

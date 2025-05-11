@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:nutrilensfire/services/color_theme_service.dart';
 import 'package:provider/provider.dart';
 import 'services/notification_service.dart';
+import '../theme/theme_colors.dart';
 
 import 'pages/health_metrics_page.dart';
 import 'pages/login.dart';
@@ -20,17 +22,23 @@ import 'pages/ingredients_profile_page.dart';
 import 'pages/calorie_goal_page.dart';
 import 'pages/history_log_page.dart';
 import 'pages/glossary_page.dart';
+import 'pages/report_issue_page.dart';
+import 'pages/add_ingredients_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  ThemeColor.setLightTheme();
   await Firebase.initializeApp();
 
   NotificationService notificationService = NotificationService();
   await notificationService.initialize();
 
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => notificationService,
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => notificationService),
+        ChangeNotifierProvider(create: (_) => ColorThemeProvider()),
+      ],
       child: NutriLensApp(notificationService: notificationService),
     ),
   );
@@ -64,6 +72,8 @@ class NutriLensApp extends StatelessWidget {
         '/health_metrics': (context) => HealthMetricsPage(),
         '/history_log': (context) => HistoryLogPage(),
         '/glossary': (context) => GlossaryPage(),
+        '/report_issue': (context) => ReportIssuePage(),
+        '/add_ingredients': (context) => AddIngredientsPage(),
       },
     );
   }

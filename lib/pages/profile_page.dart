@@ -92,6 +92,12 @@ class _ProfilePageState extends State<ProfilePage> {
                       Navigator.pushNamed(context, '/history_log');
                     },
                   ),
+                  ListTile(
+                    title: const Text('Report Issue'),
+                    onTap: () {
+                      Navigator.pushNamed(context, 'report_issue');
+                    },
+                  ),
                 ],
               ).toList(),
             ),
