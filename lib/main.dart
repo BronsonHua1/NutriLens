@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'services/notification_service.dart';
+import 'services/color_theme_service.dart';
+
 import 'pages/health_metrics_page.dart';
 import 'pages/login.dart';
 import 'pages/home_page.dart' as main_home;
@@ -26,8 +28,6 @@ import 'pages/barcode_scanner_page.dart';
 import 'pages/report_issue_page.dart';
 import 'pages/add_ingredients_page.dart';
 
-
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -39,8 +39,11 @@ void main() async {
   await notificationService.initialize();
 
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => notificationService,
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => notificationService),
+        ChangeNotifierProvider(create: (_) => ColorThemeProvider()),
+      ],
       child: NutriLensApp(notificationService: notificationService),
     ),
   );
