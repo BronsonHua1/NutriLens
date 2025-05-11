@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import '../services/local_ingredient_database_service.dart';
 
 class IngredientDatabase {
   static final IngredientDatabase instance = IngredientDatabase._init();
@@ -76,10 +77,9 @@ class IngredientDatabase {
     return result.map((map) => {
       ...map,
       'allergenRisk': map['allergenRisk'] == 1,
-      'allergenMatch': List<String>.from(jsonDecode(map['allergenMatch']?.toString() ?? '[]')),
-      'commonUses': List<String>.from(jsonDecode(map['commonUses']?.toString() ?? '[]')),
-      'dietaryTags': List<String>.from(jsonDecode(map['dietaryTags']?.toString() ?? '[]')),
-
+      'allergenMatch': map['allergenMatch'] != null ? List<String>.from(jsonDecode(map['allergenMatch']?.toString() ?? '[]')) : [],
+      'commonUses': map['commonUses'] != null ? List<String>.from(jsonDecode(map['commonUses']?.toString() ?? '[]')) : [],
+      'dietaryTags': map['dietaryTags'] != null ? List<String>.from(jsonDecode(map['dietaryTags']?.toString() ?? '[]')) : [],
     }).toList();
   }
 

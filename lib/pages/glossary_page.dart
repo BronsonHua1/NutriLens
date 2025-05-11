@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../services/local_ingredient_database_service.dart';
 
 class GlossaryPage extends StatefulWidget {
 
@@ -104,10 +105,9 @@ class _GlossaryPageState extends State<GlossaryPage> {
 
 
   void _listenForUpdates() {
-    _ingredientsRef.onValue.listen((event) {
+    _ingredientsRef.onValue.listen((event) async {
       if (event.snapshot.exists) {
-        Map<dynamic, dynamic> data =
-        event.snapshot.value as Map<dynamic, dynamic>;
+        Map<dynamic, dynamic> data = event.snapshot.value as Map<dynamic, dynamic>;
 
         List<Map<String, dynamic>> updatedIngredients = [];
 
@@ -127,9 +127,19 @@ class _GlossaryPageState extends State<GlossaryPage> {
           });
         });
 
+        // 🔗 Merge with local ingredients
+        final localIngredients = await IngredientDatabase.instance.getIngredients();
+
+        // Optional: deduplicate by name
+        final seen = <String>{};
+        final mergedIngredients = [
+          ...updatedIngredients,
+          ...localIngredients,
+        ].where((ingredient) => seen.add(ingredient['name'])).toList();
+
         setState(() {
-          _allIngredients = updatedIngredients;
-          _displayedIngredients = updatedIngredients;
+          _allIngredients = mergedIngredients;
+          _displayedIngredients = mergedIngredients;
         });
       }
     });
@@ -523,8 +533,12 @@ class _GlossaryPageState extends State<GlossaryPage> {
                   Text("Category: ${ingredient['category']}"),
                   Text("Allergen Risk: ${ingredient['allergenRisk']}"),
                   Text("Common Uses: ${ingredient['commonUses']}"),
-                  if (ingredient['allergenMatch'] != null && ingredient['allergenMatch'].isNotEmpty)
-                    Text("Allergens: ${ingredient['allergenMatch'].join(', ')}"),
+                  if ((ingredient['allergenMatch'] as List)
+                    .map((e) => e.toString().toLowerCase().trim())
+                    .toSet()
+                    .intersection(_userAllergenPreferences)
+                    .isNotEmpty)
+                  Text("Allergens: ${ingredient['allergenMatch'].join(', ')}"),
                   Row(
                     children: [
                       TextButton(
