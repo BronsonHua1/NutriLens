@@ -27,6 +27,7 @@ import 'pages/barcode_scanner_page.dart'; // <-- Your scanner page
 import 'pages/report_issue_page.dart';
 import 'pages/add_ingredients_page.dart';
 import 'services/color_theme_service.dart';
+import 'theme/theme_colors.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,6 +43,7 @@ void main() async {
   NotificationService notificationService = NotificationService();
   await notificationService.initialize();
 
+  ThemeColor.setLightTheme();
   runApp(
     MultiProvider(
       providers: [
