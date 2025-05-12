@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../components/text_field_fab.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import '../theme/theme_colors.dart';
 
 Future<String?> getCalorieGoal() async {
   User? user = FirebaseAuth.instance.currentUser;
@@ -35,17 +36,21 @@ class CalorieGoalPage extends StatelessWidget {
         context: context,
         builder: (context) {
       return AlertDialog(
-        title: Text('Enter Calorie Goal'),
+        backgroundColor: ThemeColor.background,
+        title: Text(
+            'Enter Calorie Goal',
+            style: TextStyle(color: ThemeColor.textPrimary), 
+          ),
         content: TextFieldFab(controller: goalController, hintText: 'Daily Calories', obscureText: false),
         actions: <Widget>[
           TextButton(
-            child: Text('Cancel'),
+            child: Text('Cancel', style: TextStyle(color: ThemeColor.textSecondary)),
             onPressed: () {
               Navigator.pop(context);
             },
           ),
           TextButton(
-            child: Text('Submit'),
+            child: Text('Submit', style: TextStyle(color: ThemeColor.primary)),
             onPressed: () {
               addCalorieGoal(goalController.text);
               Navigator.pop(context);
@@ -62,8 +67,13 @@ class CalorieGoalPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: ThemeColor.background,
       appBar: AppBar(
         title: const Text('Calorie Goal'),
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: ThemeColor.background,
+        foregroundColor: ThemeColor.textPrimary,
       ),
       body: Center(
         child:
@@ -78,11 +88,17 @@ class CalorieGoalPage extends StatelessWidget {
               if (snapshot.hasError) {
                 return Text(
                   snapshot.error.toString(),
+                  style: TextStyle(color: ThemeColor.textPrimary),
                 );
               }
               else {
                 return Text(
-                  'Current Calorie Goal : ${snapshot.data.toString()}'
+                  'Current Calorie Goal : ${snapshot.data.toString()}',
+                  style: TextStyle(
+                    color: ThemeColor.textPrimary,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
                 );
               }
             }
@@ -91,7 +107,10 @@ class CalorieGoalPage extends StatelessWidget {
             onPressed: () {
             inputCalorieGoal(context);
           },
-          child: const Text('Add Calorie Goal'),
+          child: Text(
+            'Add Calorie Goal',
+            style: TextStyle(color: ThemeColor.primary),
+          ),
       ),
     ])));
   }
