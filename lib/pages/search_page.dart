@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/health_rating_service.dart';
 import '../data/product_ingredient_data.dart';
 import '../services/open_food_api_service.dart';
+import '../theme/theme_colors.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -104,9 +105,9 @@ class _SearchPageState extends State<SearchPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 10),
-        const Text(
+        Text(
           "Ingredients:",
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: ThemeColor.textPrimary),
         ),
         ...ingredients.map((e) {
           final isHarmful = _harmfulIngredients.contains(e.toLowerCase());
@@ -115,7 +116,7 @@ class _SearchPageState extends State<SearchPage> {
             child: Text(
               "• $e",
               style: TextStyle(
-                color: isHarmful ? Colors.red : Colors.black,
+                color: isHarmful ? Colors.red : ThemeColor.textPrimary,
                 fontWeight: isHarmful ? FontWeight.bold : FontWeight.normal,
               ),
             ),
@@ -140,22 +141,23 @@ class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: ThemeColor.background,
       appBar: AppBar(
         title: const Text('Nutrilens'),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: ThemeColor.background,
+        foregroundColor: ThemeColor.textPrimary,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 30),
+            const SizedBox(height: 200),
             Container(
               decoration: BoxDecoration(
-                color: Colors.purple[50],
+                color: ThemeColor.secondary.withOpacity(0.7),
                 borderRadius: BorderRadius.circular(30),
               ),
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
@@ -163,28 +165,34 @@ class _SearchPageState extends State<SearchPage> {
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.menu),
+                      Icon(
+                        Icons.menu,
+                        color: ThemeColor.textSecondary,
+                      ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: TextField(
                           controller: _searchController,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             hintText: 'product or ingredient',
+                            hintStyle: TextStyle(color: ThemeColor.textPrimary),
                             border: InputBorder.none,
                           ),
+                          style: TextStyle(color: ThemeColor.textPrimary),
                           onChanged: _updateSuggestions,
                           onSubmitted: (value) => _analyzeSearch(),
                         ),
                       ),
                       IconButton(
                         icon: const Icon(Icons.search),
+                        color: ThemeColor.textSecondary, 
                         onPressed: _analyzeSearch,
                       ),
                     ],
                   ),
                   if (_filteredSuggestions.isNotEmpty)
                     ..._filteredSuggestions.map((suggestion) => ListTile(
-                      title: Text(suggestion),
+                      title: Text(suggestion, style: TextStyle(color: ThemeColor.textPrimary)),
                       onTap: () {
                         _searchController.text = suggestion;
                         _filteredSuggestions.clear();
@@ -196,9 +204,9 @@ class _SearchPageState extends State<SearchPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 10),
-                        const Text("Recent Searches:", style: TextStyle(fontWeight: FontWeight.bold)),
+                        Text("Recent Searches:", style: TextStyle(fontWeight: FontWeight.bold, color: ThemeColor.textPrimary)),
                         ..._searchHistory.reversed.take(5).map((e) => ListTile(
-                          title: Text(e),
+                          title: Text(e, style: TextStyle(color: ThemeColor.textPrimary)),
                           onTap: () {
                             _searchController.text = e;
                             _analyzeSearch();
@@ -231,15 +239,15 @@ class _SearchPageState extends State<SearchPage> {
                   Navigator.pushNamed(context, '/glossary');
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
+                  backgroundColor: ThemeColor.primary,
                   padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
                 ),
-                child: const Text(
+                child: Text(
                   "Full Glossary",
-                  style: TextStyle(color: Colors.white, fontSize: 16),
+                  style: TextStyle(color: ThemeColor.textPrimary, fontSize: 16),
                 ),
               ),
             ),
@@ -249,7 +257,7 @@ class _SearchPageState extends State<SearchPage> {
                     Navigator.pushNamed(context, '/add_ingredients');
                   },
                   style: ElevatedButton.styleFrom(
-                    //backgroundColor: ThemeColor.primary,
+                    backgroundColor: ThemeColor.secondary,
                     padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
@@ -257,7 +265,7 @@ class _SearchPageState extends State<SearchPage> {
                   ),
                   child: Text(
                     "Add Ingredients",
-                    //style: TextStyle(color: ThemeColor.textPrimary, fontSize: 16),
+                    style: TextStyle(color: ThemeColor.textSecondary, fontSize: 16),
                   ),
                 ),
               ),
@@ -266,6 +274,7 @@ class _SearchPageState extends State<SearchPage> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: ThemeColor.background,
         currentIndex: 3,
         type: BottomNavigationBarType.fixed,
         items: const [
