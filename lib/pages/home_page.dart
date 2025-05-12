@@ -10,6 +10,7 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       backgroundColor: ThemeColor.background,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         iconTheme: IconThemeData(color: ThemeColor.textPrimary),
         title: Text('Nutrilens', style: TextStyle(color: ThemeColor.textPrimary)),
         centerTitle: true,

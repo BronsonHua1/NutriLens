@@ -74,11 +74,12 @@ class _SettingsPageState extends State<SettingsPage> {
     return Scaffold(
       backgroundColor: ThemeColor.background,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         iconTheme: IconThemeData(color: ThemeColor.textPrimary),
         title: Text('Nutrilens', style: TextStyle(color: ThemeColor.textPrimary)),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: ThemeColor.secondary,
+        backgroundColor: ThemeColor.primary,
         foregroundColor: ThemeColor.textPrimary, // Text color
       ),
       body: ListView(

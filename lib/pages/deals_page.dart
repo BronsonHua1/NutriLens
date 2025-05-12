@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/openfood_deals_service.dart';
+import '../theme/theme_colors.dart';
 
 class DealsPage extends StatefulWidget {
   const DealsPage({Key? key}) : super(key: key);
@@ -28,7 +29,6 @@ class _DealsPageState extends State<DealsPage> {
 
     final deals = await _dealsService.fetchGroceryDeals(category: _currentCategory);
 
-    if (!mounted) return;
     setState(() {
       _deals = deals;
       _isLoading = false;
@@ -47,10 +47,14 @@ class _DealsPageState extends State<DealsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: ThemeColor.background,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text('Grocery Deals'),
         centerTitle: true,
-        backgroundColor: Colors.green,
+        elevation: 0,
+        backgroundColor: ThemeColor.background,
+        foregroundColor: ThemeColor.textPrimary, // Text color
       ),
       body: Column(
         children: [
@@ -60,6 +64,9 @@ class _DealsPageState extends State<DealsPage> {
             child: DropdownButton<String>(
               value: _currentCategory,
               isExpanded: true,
+              dropdownColor: ThemeColor.background, // dropdown background
+              iconEnabledColor: ThemeColor.primary, // arrow icon color
+              style: TextStyle(color: ThemeColor.textPrimary), // selected text
               items: const [
                 DropdownMenuItem(value: 'snacks', child: Text('Snacks')),
                 DropdownMenuItem(value: 'beverages', child: Text('Drinks')),
@@ -71,21 +78,24 @@ class _DealsPageState extends State<DealsPage> {
           ),
           Expanded(
             child: _isLoading
-                ? const Center(
+                ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(color: Colors.green),
+                  CircularProgressIndicator(color: ThemeColor.primary),
                   SizedBox(height: 20),
-                  Text('Fetching grocery deals...')
+                  Text(
+                  'Fetching grocery deals...',
+                  style: TextStyle(color: ThemeColor.textPrimary),                
+                  ),
                 ],
               ),
             )
                 : _deals.isEmpty
-                ? const Center(
+                ? Center(
               child: Text(
                 '😢 No deals found. Try another category!',
-                style: TextStyle(fontSize: 18),
+                style: TextStyle(fontSize: 18, color: ThemeColor.textPrimary),
               ),
             )
                 : RefreshIndicator(
@@ -96,6 +106,7 @@ class _DealsPageState extends State<DealsPage> {
                 itemBuilder: (context, index) {
                   final deal = _deals[index];
                   return Card(
+                    color: ThemeColor.background,
                     margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                     elevation: 5,
                     shape: RoundedRectangleBorder(
@@ -109,16 +120,22 @@ class _DealsPageState extends State<DealsPage> {
                       ),
                       title: Text(
                         deal['title'] ?? 'Unknown Product',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: ThemeColor.textPrimary, 
+                        ),
                       ),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(deal['brand'] ?? 'Unknown Brand'),
+                          Text(
+                            deal['brand'] ?? 'Unknown Brand',
+                            style: TextStyle(color: ThemeColor.textSecondary), // 🔹 Brand text color
+                          ),
                           const SizedBox(height: 4),
                           Text(
                             'Store: ${deal['store'] ?? 'Various stores'}',
-                            style: const TextStyle(color: Colors.blueGrey),
+                            style: TextStyle(color: ThemeColor.textSecondary),
                           ),
                           const SizedBox(height: 4),
                           Text(
@@ -137,14 +154,16 @@ class _DealsPageState extends State<DealsPage> {
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: ThemeColor.background,
         currentIndex: 2,
         type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.local_offer, color: Colors.green), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
+        items: [
+          BottomNavigationBarItem(icon: Icon(Icons.settings, color: ThemeColor.textSecondary), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.notifications, color: ThemeColor.textSecondary), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.local_offer,  color: ThemeColor.primary), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.home, color: ThemeColor.textSecondary), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.search,  color: ThemeColor.textSecondary), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.person,  color: ThemeColor.textSecondary), label: ''),
         ],
         onTap: (index) {
           if (index == 0) {
@@ -154,8 +173,10 @@ class _DealsPageState extends State<DealsPage> {
           } else if (index == 2) {
             Navigator.pushNamed(context, '/deals');
           } else if (index == 3) {
-            Navigator.pushNamed(context, '/search');
+            Navigator.pushNamed(context, '/home');
           } else if (index == 4) {
+            Navigator.pushNamed(context, '/search');
+          } else if (index == 5) {
             Navigator.pushNamed(context, '/profile');
           }
         },
