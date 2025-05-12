@@ -8,6 +8,7 @@ import '../services/sprouts_deals_scraper.dart';
 import '../services/albertsons_deals_scraper.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:nutrilensfire/pages/login.dart';
+import '../theme/theme_colors.dart';
 
 
 class SettingsPage extends StatefulWidget {
@@ -158,32 +159,17 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           const Divider(),
           ListTile(
-            title: const Text('User Guide', style: TextStyle(fontWeight: FontWeight.bold)),
-            trailing: const Icon(Icons.arrow_forward_ios),
-            onTap: () {
-              Navigator.pushNamed(context, '/user_guide');
-            },
-          ),
-          const Divider(),
-          ListTile(
-            title: const Text('Support', style: TextStyle(fontWeight: FontWeight.bold)),
-            trailing: const Icon(Icons.arrow_forward_ios),
-            onTap: () {
-              Navigator.pushNamed(context, '/support');
-            },
-          ),
-          const Divider(),
-          ListTile(
-            title: const Text('Change Password', style: TextStyle(fontWeight: FontWeight.bold)),
-            trailing: const Icon(Icons.arrow_forward_ios),
-            onTap: () {
-              Navigator.pushNamed(context, '/change_password');
-            },
-          ),
-          const Divider(),
-          ListTile(
-            title: const Text('Test Firebase Connection', style: TextStyle(fontWeight: FontWeight.bold)),
-            trailing: const Icon(Icons.cloud_upload),
+            title: Text(
+              'Test Firebase Connection',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: ThemeColor.textPrimary, // or any color you want
+              ),
+            ),
+            trailing: Icon(
+              Icons.cloud_upload,
+              color: ThemeColor.textSecondary, // or any color
+            ),
             onTap: () async {
               await testFirebaseWrite();
             },

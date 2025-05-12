@@ -277,12 +277,12 @@ class _SearchPageState extends State<SearchPage> {
         backgroundColor: ThemeColor.background,
         currentIndex: 3,
         type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.search, color: Colors.green), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
+        items: [
+          BottomNavigationBarItem(icon: Icon(Icons.settings, color: ThemeColor.textSecondary), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.notifications, color: ThemeColor.textSecondary), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.home, color: ThemeColor.textSecondary), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.search, color: ThemeColor.primary), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.person, color: ThemeColor.textSecondary), label: ''),
         ],
         onTap: (index) {
           if (index == 0) Navigator.pushNamed(context, '/settings');
