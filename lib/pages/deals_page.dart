@@ -28,6 +28,7 @@ class _DealsPageState extends State<DealsPage> {
 
     final deals = await _dealsService.fetchGroceryDeals(category: _currentCategory);
 
+    if (!mounted) return;
     setState(() {
       _deals = deals;
       _isLoading = false;

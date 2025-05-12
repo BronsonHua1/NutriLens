@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import '../theme/theme_colors.dart';
+import '../services/color_theme_service.dart';
 
 class DietaryPreferencesPage extends StatefulWidget {
   const DietaryPreferencesPage({Key? key}) : super(key: key);
@@ -87,9 +89,14 @@ class _DietaryPreferencesPageState extends State<DietaryPreferencesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: ThemeColor.background,
       appBar: AppBar(
-        title: const Text("Dietary Preferences"),
-        backgroundColor: Colors.teal,
+        iconTheme: IconThemeData(color: ThemeColor.textPrimary),
+        title: Text('Nutrilens', style: TextStyle(color: ThemeColor.textPrimary)),
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: ThemeColor.background,
+        foregroundColor: ThemeColor.textPrimary, // Text colo
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

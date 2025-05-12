@@ -9,11 +9,12 @@ enum AppTheme {
 }
 
 class ColorThemeProvider with ChangeNotifier {
-  AppTheme _currentTheme = AppTheme.light; // default theme
+  AppTheme _currentTheme = AppTheme.light;
 
   AppTheme get currentTheme => _currentTheme;
 
   ColorThemeProvider() {
+    // This ensures the theme values are initialized
     ThemeColor.setLightTheme();
   }
 
@@ -35,6 +36,6 @@ class ColorThemeProvider with ChangeNotifier {
         break;
     }
 
-    notifyListeners(); // rebuild UI
+    notifyListeners();
   }
 }

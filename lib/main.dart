@@ -28,6 +28,8 @@ import 'pages/barcode_scanner_page.dart';
 import 'pages/report_issue_page.dart';
 import 'pages/add_ingredients_page.dart';
 
+import '../theme/theme_colors.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -37,6 +39,8 @@ void main() async {
 
   NotificationService notificationService = NotificationService();
   await notificationService.initialize();
+  
+  ThemeColor.setLightTheme();
 
   runApp(
     MultiProvider(

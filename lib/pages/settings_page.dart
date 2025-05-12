@@ -78,7 +78,7 @@ class _SettingsPageState extends State<SettingsPage> {
         title: Text('Nutrilens', style: TextStyle(color: ThemeColor.textPrimary)),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: ThemeColor.background,
+        backgroundColor: ThemeColor.secondary,
         foregroundColor: ThemeColor.textPrimary, // Text color
       ),
       body: ListView(
@@ -167,20 +167,6 @@ class _SettingsPageState extends State<SettingsPage> {
           const Divider(),
           ListTile(
             title: Text(
-              'Language',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: ThemeColor.textPrimary,
-              ),
-            ),
-            trailing: const Icon(Icons.arrow_forward_ios),
-            onTap: () {
-              Navigator.pushNamed(context, '/language');
-            },
-          ),
-          const Divider(),
-          ListTile(
-            title: Text(
               'Theme',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
@@ -204,48 +190,6 @@ class _SettingsPageState extends State<SettingsPage> {
             trailing: const Icon(Icons.arrow_forward_ios),
             onTap: () {
               Navigator.pushNamed(context, '/dietary_preferences');
-            },
-          ),
-          const Divider(),
-          ListTile(
-            title: Text(
-              'User Guide',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: ThemeColor.textPrimary,
-              ),
-            ),
-            trailing: const Icon(Icons.arrow_forward_ios),
-            onTap: () {
-              Navigator.pushNamed(context, '/user_guide');
-            },
-          ),
-          const Divider(),
-          ListTile(
-            title: Text(
-              'Support',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: ThemeColor.textPrimary,
-              ),
-            ),
-            trailing: const Icon(Icons.arrow_forward_ios),
-            onTap: () {
-              Navigator.pushNamed(context, '/support');
-            },
-          ),
-          const Divider(),
-          ListTile(
-            title: Text(
-              'Change Password',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: ThemeColor.textPrimary,
-              ),
-            ),
-            trailing: const Icon(Icons.arrow_forward_ios),
-            onTap: () {
-              Navigator.pushNamed(context, '/change_password');
             },
           ),
           const Divider(),
