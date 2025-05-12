@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
 import '../services/local_ingredient_database_service.dart';
+import '../theme/theme_colors.dart';
+import '../services/color_theme_service.dart';
 
 class GlossaryPage extends StatefulWidget {
 
@@ -9,9 +12,6 @@ class GlossaryPage extends StatefulWidget {
   final bool resetOnOpen;
 
   const GlossaryPage({Key? key, this.defaultFilter, this.resetOnOpen = false}) : super(key: key);
-
-
-
 
   @override
   _GlossaryPageState createState() => _GlossaryPageState();
@@ -21,10 +21,6 @@ class _GlossaryPageState extends State<GlossaryPage> {
 
   Set<String> _userAllergenPreferences = {}; // new for allergen color highlighting
   Set<String> _userDietaryPreferences = {};
-
-
-
-
 
   Future<void> _loadUserAllergenPreferences() async {
     final user = FirebaseAuth.instance.currentUser;
@@ -102,8 +98,6 @@ class _GlossaryPageState extends State<GlossaryPage> {
     }
   }
 
-
-
   void _listenForUpdates() {
     _ingredientsRef.onValue.listen((event) async {
       if (event.snapshot.exists) {
@@ -174,11 +168,6 @@ class _GlossaryPageState extends State<GlossaryPage> {
       "avoid": {for (var item in _userAvoidIngredients) item: true},
     });
   }
-
-
-
-
-
 
   Future<void> _loadIngredients() async {
     if (!_hasMore) return;
@@ -441,28 +430,33 @@ class _GlossaryPageState extends State<GlossaryPage> {
         .where((a) => normalizedUserPrefs.contains(a))
         .length;
 
+    final themeProvider = Provider.of<ColorThemeProvider>(context, listen: false);
+
     if (userAllergenMatches > 1) {
+      if (themeProvider.currentTheme == AppTheme.dark) {
+        return Color(0xFF560d0d);
+      }
       return Colors.red.shade200; // multiple user allergens
     } else if (userAllergenMatches == 1) {
+      if (themeProvider.currentTheme == AppTheme.dark) {
+        return Color(0xFF6f0000);
+      }
       return Colors.red.shade100; // one user allergen
     }
 
-    return Colors.white; // no match
+    return ThemeColor.background; // no match
   }
-
-
-
-
-
-
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: ThemeColor.background,
       appBar: AppBar(
         title: const Text('Glossary'),
-        backgroundColor: Colors.green,
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: ThemeColor.background,
+        foregroundColor: ThemeColor.textPrimary,
         actions: [
           IconButton(
             icon: const Icon(Icons.filter_list),
@@ -492,7 +486,10 @@ class _GlossaryPageState extends State<GlossaryPage> {
             child: ListTile(
               title: Row(
                 children: [
-                  Text(name),
+                  Text(
+                    name,
+                    style: TextStyle(color: ThemeColor.textPrimary),
+                  ),
                   if ((ingredient['DietaryTags'] ?? [])
                       .map((e) => e.toString().toLowerCase())
                       .any((tag) => _userDietaryPreferences.contains(tag)))
@@ -520,25 +517,25 @@ class _GlossaryPageState extends State<GlossaryPage> {
                         child: Icon(Icons.block, color: Colors.red, size: 18),
                       ),
                     ),
-
+                  
                 ],
               ),
               subtitle: isExpanded
                   ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Description: ${ingredient['description']}"),
-                  Text("Health Impact: ${ingredient['healthImpact']}"),
-                  Text("Warnings: ${ingredient['warnings']}"),
-                  Text("Category: ${ingredient['category']}"),
-                  Text("Allergen Risk: ${ingredient['allergenRisk']}"),
-                  Text("Common Uses: ${ingredient['commonUses']}"),
+                  Text("Description: ${ingredient['description']}", style: TextStyle(color: ThemeColor.textPrimary)),
+                  Text("Health Impact: ${ingredient['healthImpact']}", style: TextStyle(color: ThemeColor.textPrimary)),
+                  Text("Warnings: ${ingredient['warnings']}", style: TextStyle(color: ThemeColor.textPrimary)),
+                  Text("Category: ${ingredient['category']}", style: TextStyle(color: ThemeColor.textPrimary)),
+                  Text("Allergen Risk: ${ingredient['allergenRisk']}", style: TextStyle(color: ThemeColor.textPrimary)),
+                  Text("Common Uses: ${ingredient['commonUses']}", style: TextStyle(color: ThemeColor.textPrimary)),
                   if ((ingredient['allergenMatch'] as List)
                     .map((e) => e.toString().toLowerCase().trim())
                     .toSet()
                     .intersection(_userAllergenPreferences)
                     .isNotEmpty)
-                  Text("Allergens: ${ingredient['allergenMatch'].join(', ')}"),
+                  Text("Allergens: ${ingredient['allergenMatch'].join(', ')}", style: TextStyle(color: ThemeColor.textPrimary)),
                   Row(
                     children: [
                       TextButton(
@@ -569,7 +566,6 @@ class _GlossaryPageState extends State<GlossaryPage> {
                         },
                         child: Text(isAvoidMarked ? "Unmark Avoid" : "Mark as Avoid"),
                       ),
-
                     ],
                   ),
                 ],
