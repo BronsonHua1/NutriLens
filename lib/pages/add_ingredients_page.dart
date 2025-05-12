@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/local_ingredient_database_service.dart';
+import '../theme/theme_colors.dart';
 
 class AddIngredientsPage extends StatefulWidget {
   const AddIngredientsPage({super.key});
@@ -91,102 +92,113 @@ class _AddIngredientsPageState extends State<AddIngredientsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: ThemeColor.background,
       appBar: AppBar(
         title: const Text('Add Ingredients'),
-        backgroundColor: Colors.green,
-        foregroundColor: Colors.white,
+        backgroundColor: ThemeColor.background,
+        foregroundColor: ThemeColor.textPrimary,
       ),
-      body: SingleChildScrollView(
+      body: 
+      SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    _showUploaded = !_showUploaded;
-                  });
-                },
-                child: Text(_showUploaded ? 'Hide Uploaded Ingredients' : 'View Uploaded Ingredients'),
-              ),
-              const SizedBox(height: 20),
-              if (_showUploaded)
-                Container(
-                  height: 300,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(10),
+          child: DefaultTextStyle(
+            style: TextStyle(color: ThemeColor.textSecondary),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _showUploaded = !_showUploaded;
+                    });
+                  },
+                  child: Text(_showUploaded ? 'Hide Uploaded Ingredients' : 'View Uploaded Ingredients'),
+                ),
+                const SizedBox(height: 20),
+                if (_showUploaded)
+                  Container(
+                    height: 300,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: ListView.builder(
+                      padding: const EdgeInsets.all(10),
+                      itemCount: _ingredients.length,
+                      itemBuilder: (context, index) {
+                        final ingredient = _ingredients[index];
+                        return Card(
+                          elevation: 2,
+                          margin: const EdgeInsets.symmetric(vertical: 8),
+                          child: ListTile(
+                            title: Text(ingredient['name'] ?? 'Unnamed'),
+                            subtitle: Text('Health Rating: ${ingredient['healthRating']} - ${ingredient['category']}'),
+                            onTap: () => _showIngredientDetails(ingredient),
+                          ),
+                        );
+                      },
+                    ),
                   ),
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(10),
-                    itemCount: _ingredients.length,
-                    itemBuilder: (context, index) {
-                      final ingredient = _ingredients[index];
-                      return Card(
-                        elevation: 2,
-                        margin: const EdgeInsets.symmetric(vertical: 8),
-                        child: ListTile(
-                          title: Text(ingredient['name'] ?? 'Unnamed'),
-                          subtitle: Text('Health Rating: ${ingredient['healthRating']} - ${ingredient['category']}'),
-                          onTap: () => _showIngredientDetails(ingredient),
-                        ),
-                      );
-                    },
+                const SizedBox(height: 20),
+                TextField(controller: _nameController, decoration: InputDecoration(labelText: 'Name', labelStyle: TextStyle(color: ThemeColor.textSecondary))),
+                TextField(controller: _descriptionController, decoration: InputDecoration(labelText: 'Description', labelStyle: TextStyle(color: ThemeColor.textSecondary))),
+                TextField(controller: _healthRatingController, decoration: InputDecoration(labelText: 'Health Rating (1-10)', labelStyle: TextStyle(color: ThemeColor.textSecondary)), keyboardType: TextInputType.number),
+                TextField(controller: _categoryController, decoration: InputDecoration(labelText: 'Category', labelStyle: TextStyle(color: ThemeColor.textSecondary))),
+                SwitchListTile(
+                  title: Text(
+                    'Allergen Risk',
+                    style: TextStyle(color: ThemeColor.textSecondary),  
+                  ),
+                  value: _allergenRisk,
+                  onChanged: (val) => setState(() => _allergenRisk = val),
+                ),
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 8.0, bottom: 4.0),
+                    child: Text('Select Allergens'),
                   ),
                 ),
-              const SizedBox(height: 20),
-              TextField(controller: _nameController, decoration: const InputDecoration(labelText: 'Name')),
-              TextField(controller: _descriptionController, decoration: const InputDecoration(labelText: 'Description')),
-              TextField(controller: _healthRatingController, decoration: const InputDecoration(labelText: 'Health Rating (1-10)'), keyboardType: TextInputType.number),
-              TextField(controller: _categoryController, decoration: const InputDecoration(labelText: 'Category')),
-              SwitchListTile(
-                title: const Text('Allergen Risk'),
-                value: _allergenRisk,
-                onChanged: (val) => setState(() => _allergenRisk = val),
-              ),
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Padding(
-                  padding: EdgeInsets.only(top: 8.0, bottom: 4.0),
-                  child: Text('Select Allergens'),
+                ListView(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: _allAvailableAllergens.map((allergen) {
+                    return CheckboxListTile(
+                     title: Text(
+                      allergen,
+                      style: TextStyle(color: ThemeColor.textSecondary), 
+                    ), 
+                      value: _selectedAllergens.contains(allergen.toLowerCase()),
+                      onChanged: (checked) {
+                        setState(() {
+                          if (checked == true) {
+                            _selectedAllergens.add(allergen.toLowerCase());
+                          } else {
+                            _selectedAllergens.remove(allergen.toLowerCase());
+                          }
+                        });
+                      },
+                    );
+                  }).toList(),
                 ),
-              ),
-              ListView(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                children: _allAvailableAllergens.map((allergen) {
-                  return CheckboxListTile(
-                    title: Text(allergen),
-                    value: _selectedAllergens.contains(allergen.toLowerCase()),
-                    onChanged: (checked) {
-                      setState(() {
-                        if (checked == true) {
-                          _selectedAllergens.add(allergen.toLowerCase());
-                        } else {
-                          _selectedAllergens.remove(allergen.toLowerCase());
-                        }
-                      });
-                    },
-                  );
-                }).toList(),
-              ),
-              TextField(controller: _commonUsesController, decoration: const InputDecoration(labelText: 'Common Uses (comma-separated)')),
-              TextField(controller: _dietaryTagsController, decoration: const InputDecoration(labelText: 'Dietary Tags (comma-separated)')),
-              TextField(controller: _healthImpactController, decoration: const InputDecoration(labelText: 'Health Impact')),
-              TextField(controller: _warningsController, decoration: const InputDecoration(labelText: 'Warnings')),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _addIngredient,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                TextField(controller: _commonUsesController, decoration: InputDecoration(labelText: 'Common Uses (comma-separated)', labelStyle: TextStyle(color: ThemeColor.textSecondary))),
+                TextField(controller: _dietaryTagsController, decoration: InputDecoration(labelText: 'Dietary Tags (comma-separated)', labelStyle: TextStyle(color: ThemeColor.textSecondary))),
+                TextField(controller: _healthImpactController, decoration: InputDecoration(labelText: 'Health Impact', labelStyle: TextStyle(color: ThemeColor.textSecondary))),
+                TextField(controller: _warningsController, decoration: InputDecoration(labelText: 'Warnings', labelStyle: TextStyle(color: ThemeColor.textSecondary))),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _addIngredient,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ThemeColor.primary,
+                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  ),
+                  child: Text('Add Ingredient', style: TextStyle(color: ThemeColor.textPrimary)),
                 ),
-                child: const Text('Add Ingredient', style: TextStyle(color: Colors.white)),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

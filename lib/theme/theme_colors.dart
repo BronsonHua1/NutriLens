@@ -24,7 +24,7 @@ class ThemeColor {
     secondary = Color(0xFF1E5128);        
     background = Color(0xFF191A19);       
     textPrimary = Colors.white;           
-    textSecondary = Colors.white;
+    textSecondary = Colors.white; 
   }
 
   //apply warm theme values
