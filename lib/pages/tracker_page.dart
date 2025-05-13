@@ -1,6 +1,4 @@
-
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import '../components/text_field_fab.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -8,6 +6,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:nutrilensfire/pages/calorie_goal_page.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import '../theme/theme_colors.dart'; 
 
 class TrackerPage extends StatelessWidget {
   final barcodeController = TextEditingController();
@@ -100,7 +99,8 @@ class TrackerPage extends StatelessWidget {
         context: context,
         builder: (context) {
           return AlertDialog(
-              title: Text('Enter Meal Information'),
+            backgroundColor: ThemeColor.background,
+              title: Text('Enter Meal Information', style: TextStyle(color: ThemeColor.textPrimary)),
               content: SingleChildScrollView(
                 child: ListBody (
                 children: [
@@ -116,13 +116,13 @@ class TrackerPage extends StatelessWidget {
               ),
               actions: <Widget>[
                 TextButton(
-                  child: Text('Cancel'),
+                  child: Text('Cancel', style: TextStyle(color: ThemeColor.textSecondary)),
                   onPressed: () {
                     Navigator.pop(context);
                   },
                 ),
                 TextButton(
-                  child: Text('Submit'),
+                  child: Text('Submit', style: TextStyle(color: ThemeColor.primary)),
                   onPressed: () {
                     addMeal(calorieController.text, proteinController.text, carbController.text, fatController.text);
                     Navigator.pop(context);
@@ -141,7 +141,8 @@ class TrackerPage extends StatelessWidget {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text('Enter Meal Barcode'),
+            backgroundColor: ThemeColor.background,
+            title: Text('Enter Meal Barcode', style: TextStyle(color: ThemeColor.textPrimary)),
               content: SingleChildScrollView(
                 child: ListBody (
                   children: [
@@ -151,13 +152,13 @@ class TrackerPage extends StatelessWidget {
               ),
               actions: <Widget>[
                 TextButton(
-                  child: Text('Cancel'),
+                  child: Text('Cancel', style: TextStyle(color: ThemeColor.textSecondary)), 
                   onPressed: () {
                     Navigator.pop(context);
                   },
                 ),
                 TextButton(
-                  child: Text('Submit'),
+                  child: Text('Submit', style: TextStyle(color: ThemeColor.primary)),
                   onPressed: () {
                     barcodeAPI(barcodeController.text);
                     Navigator.pop(context);
@@ -173,8 +174,11 @@ class TrackerPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: ThemeColor.background,
         appBar: AppBar(
           title: const Text('Meals'), // Change to display previously entered items
+          backgroundColor: ThemeColor.background,
+          foregroundColor: ThemeColor.textPrimary,
         ),
         body: Center(
             child:
@@ -184,13 +188,13 @@ class TrackerPage extends StatelessWidget {
                     onPressed: () {
                       inputMeal(context);
                     },
-                    child: const Text('Add Meal'),
+                    child: Text('Add Meal', style: TextStyle(color: ThemeColor.primary)),
                   ),
                   TextButton(
                     onPressed: () {
                       inputMealBarcode(context);
                     },
-                    child: const Text('Add Meal Barcode'),
+                    child: Text('Add Meal Barcode', style: TextStyle(color: ThemeColor.primary)),
                   ),
                   FutureBuilder(
                       future: getCalorieGoal(),
@@ -201,11 +205,13 @@ class TrackerPage extends StatelessWidget {
                         if (snapshot.hasError) {
                           return Text(
                             snapshot.error.toString(),
+                            style: TextStyle(color: ThemeColor.textPrimary),
                           );
                         }
                         else {
                           return Text(
-                              'Current Calorie Goal : ${snapshot.data.toString()}'
+                              'Current Calorie Goal : ${snapshot.data.toString()}',
+                              style: TextStyle(color: ThemeColor.textPrimary)
                           );
                         }
                       }
@@ -220,6 +226,7 @@ class TrackerPage extends StatelessWidget {
                         if (snapshot.hasError) {
                           return Text(
                             snapshot.error.toString(),
+                            style: TextStyle(color: ThemeColor.textPrimary),
                           );
                         }
                         else {
@@ -229,10 +236,12 @@ class TrackerPage extends StatelessWidget {
                             itemBuilder: (context, index) {
                               return Card(
                                 margin: const EdgeInsets.all(8.0),
+                                color: ThemeColor.primary,
                                 child: Padding(
                                   padding: const EdgeInsets.all(16),
                                   child: Text(
-                                      'Tracked Calories : ${snapshot.data?[1].toString()}\n\nTracked Meals : ${snapshot.data?[0].toString()}'
+                                      'Tracked Calories : ${snapshot.data?[1].toString()}\n\nTracked Meals : ${snapshot.data?[0].toString()}',
+                                      style: TextStyle(color: ThemeColor.textPrimary)
                                   ),
                                 )
                               );
@@ -243,6 +252,4 @@ class TrackerPage extends StatelessWidget {
                   ),
                   ),],),),);
   }
-
-
 }
