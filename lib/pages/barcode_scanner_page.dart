@@ -4,9 +4,8 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:http/http.dart' as http;
 import 'package:hive_flutter/hive_flutter.dart';
-import 'home_page.dart';
 
-void BarcodeScanner() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
   await Hive.openBox('productCache');
@@ -28,30 +27,83 @@ class ScannerHome extends StatelessWidget {
   }
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  bool useManualEntry = false;
+  final TextEditingController barcodeController = TextEditingController();
+
+  void _handleBarcode(String code) {
+    if (code.isNotEmpty) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ProductDetailsPage(barcode: code),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Nutrilens")),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () async {
-            final scannedCode = await Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const BarcodeScannerPage()),
-            );
-            if (scannedCode != null && scannedCode != "-1") {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ProductDetailsPage(barcode: scannedCode),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SwitchListTile(
+              title: const Text("Use Manual Entry"),
+              value: useManualEntry,
+              onChanged: (value) {
+                setState(() {
+                  useManualEntry = value;
+                });
+              },
+            ),
+            const SizedBox(height: 16),
+            if (useManualEntry)
+              Column(
+                children: [
+                  TextField(
+                    controller: barcodeController,
+                    decoration: const InputDecoration(
+                      labelText: 'Enter Barcode',
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.number,
+                  ),
+                  const SizedBox(height: 12),
+                  ElevatedButton(
+                    onPressed: () {
+                      _handleBarcode(barcodeController.text.trim());
+                    },
+                    child: const Text("Fetch Product"),
+                  ),
+                ],
+              )
+            else
+              Center(
+                child: ElevatedButton(
+                  onPressed: () async {
+                    final scannedCode = await Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const BarcodeScannerPage()),
+                    );
+                    if (scannedCode != null && scannedCode != "-1") {
+                      _handleBarcode(scannedCode);
+                    }
+                  },
+                  child: const Text("Scan Barcode"),
                 ),
-              );
-            }
-          },
-          child: const Text("Scan Barcode"),
+              ),
+          ],
         ),
       ),
     );

@@ -7,7 +7,8 @@ import '../services/smart_final_deals_scraper.dart';
 import '../services/sprouts_deals_scraper.dart';
 import '../services/albertsons_deals_scraper.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:nutrilensfire/pages/login.dart'; // ✅ Import login.dart page
+import 'package:nutrilensfire/pages/login.dart';
+
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -24,6 +25,7 @@ class _SettingsPageState extends State<SettingsPage> {
     _loadNotificationPreference();
   }
 
+  // Loads the notification preference from Firebase
   Future<void> _loadNotificationPreference() async {
     var notificationService = Provider.of<NotificationService>(context, listen: false);
     String frequency = await notificationService.getNotificationFrequency(userId);
@@ -51,6 +53,7 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
+  // Updates the notification preference in Firebase
   void _updateNotificationPreference(String newFrequency) async {
     var notificationService = Provider.of<NotificationService>(context, listen: false);
     await notificationService.saveNotificationFrequency(userId, newFrequency);
@@ -186,6 +189,7 @@ class _SettingsPageState extends State<SettingsPage> {
             },
           ),
           const Divider(),
+
 
           if (user != null)
             ListTile(

@@ -61,16 +61,22 @@ class ApiService {
 
   /// Save recall alerts to Firebase
   Future<void> saveRecallToFirebase(String product, String reason, String date) async {
-    DatabaseReference ref = FirebaseDatabase.instance.ref("recalls");
+    final String key = '${product.hashCode}_$date';
+    final DatabaseReference ref = FirebaseDatabase.instance.ref("recalls/$key");
 
-    await ref.push().set({
-      "product": product,
-      "reason": reason,
-      "date": date,
-    });
-
-    print("✅ Recall saved to Firebase!");
+    final snapshot = await ref.get();
+    if (!snapshot.exists) {
+      await ref.set({
+        "product": product,
+        "reason": reason,
+        "date": date,
+      });
+      print("✅ Recall saved to Firebase!");
+    } else {
+      print("⚠️ Duplicate recall skipped: $product ($date)");
+    }
   }
+
 
   /// Save ingredient warnings to Firebase
   Future<void> saveIngredientWarningToFirebase(String ingredient, String risk) async {
